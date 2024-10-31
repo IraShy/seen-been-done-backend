@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-async function dbConnect() {
+const dbConnect = async () => {
   const env = process.env.NODE_ENV || "development";
   const dbUri =
     env === "production"
@@ -15,17 +15,17 @@ async function dbConnect() {
 
   await mongoose.connect(dbUri);
   console.log("DB connected");
-}
+};
 
-async function dbDisconnect() {
+const dbDisconnect = async () => {
   await mongoose.connection.close();
   console.log("DB  disconected");
-}
+};
 
-async function dbDrop() {
+const dbDrop = async () => {
   await mongoose.connection.db.dropDatabase();
   console.log("DB  cleared");
-}
+};
 
 module.exports = {
   dbConnect,
