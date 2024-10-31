@@ -9,6 +9,9 @@ app.get("/", (request, response, next) => {
   });
 });
 
+const userRouter = require("./routers/userRouter.js");
+app.use("/users", userRouter);
+
 app.get("*", (request, response, next) => {
   response.status(404).json({
     message: "Page not found",
