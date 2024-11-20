@@ -11,6 +11,11 @@ const seedUsers = async () => {
       email: "user2@example.com",
       password: "password",
     },
+    {
+      email: "admin@example.com",
+      password: "password",
+      admin: true,
+    },
   ];
 
   const seededUsers = await User.insertMany(users);
