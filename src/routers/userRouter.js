@@ -16,8 +16,9 @@ router.get("/:id", async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) {
       res.status(404).json({ error: "User not found" });
+    } else {
+      res.json(user);
     }
-    res.send(user);
   } catch (err) {
     res.status(404).json({ error: err.message });
   }
@@ -30,8 +31,9 @@ router.post("/", async (req, res) => {
     let user = await User.create(req.body);
     if (!user) {
       res.status(400).json({ error: "Error registering user" });
+    } else {
+      res.json(user);
     }
-    res.send(user);
   } catch {
     res.status(400).json({ error: "Error registering user" });
   }
