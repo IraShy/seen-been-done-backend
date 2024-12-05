@@ -5,13 +5,21 @@ dotenv.config();
 
 const dbConnect = async () => {
   const env = process.env.NODE_ENV || "development";
-  const dbUri =
-    env === "production"
-      ? process.env.DB_URI_PROD
-      : env === "test"
-      ? process.env.DB_URI_TEST ||
-        "mongodb://localhost:27017/seen-been-done-test"
-      : process.env.DB_URI_DEV || "mongodb://localhost:27017/seen-been-done";
+
+  if (env === "production") {
+    dbUri = process.env.DB_URI_PROD;
+  }
+
+  if (env === "test") {
+    dbUri =
+      process.env.DB_URI_TEST ||
+      "mongodb://localhost:27017/seen-been-done-test";
+  }
+
+  if (env === "development") {
+    dbUri =
+      process.env.DB_URI_DEV || "mongodb://localhost:27017/seen-been-done";
+  }
 
   await mongoose.connect(dbUri);
   console.log("DB connected");
