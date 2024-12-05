@@ -51,8 +51,44 @@ router.post("/", async (req, res) => {
   }
 });
 
-// TODO: Login
+// Login
 // POST /users/login
+
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!password || !email) {
+      res.status(400).json({ error: "Missing credentials" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    const isValid = await bcrypt.compare(user.password, hash);
+    if (!isValid) {
+      console.log("Invalid password");
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+    // res.json(user);
+    const payload = {
+      id: user._id,
+      admin: user.admin,
+    };
+    const expiresIn = "2h";
+    const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn });
+    console.log(`${user.email} signed in!\nToken: ${token}`);
+    res.json({ token });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 // Update a user
 // PUT /users/:id
