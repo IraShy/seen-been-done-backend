@@ -6,7 +6,7 @@ const router = express.Router();
 // Find all users
 // GET /users/
 router.get("/", async (req, res) => {
-  res.send(await User.find({}));
+  res.json(await User.find({}));
 });
 
 // Find one user by ID
@@ -15,11 +15,11 @@ router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      res.status(404).send({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
     }
     res.send(user);
   } catch (err) {
-    res.status(404).send({ error: err.message });
+    res.status(404).json({ error: err.message });
   }
 });
 
@@ -29,11 +29,11 @@ router.post("/", async (req, res) => {
   try {
     let user = await User.create(req.body);
     if (!user) {
-      res.status(400).send({ error: "Error registering user" });
+      res.status(400).json({ error: "Error registering user" });
     }
     res.send(user);
   } catch {
-    res.status(400).send({ error: "Error registering user" });
+    res.status(400).json({ error: "Error registering user" });
   }
 });
 
@@ -48,9 +48,9 @@ router.put("/:id", async (req, res) => {
       new: true,
     });
     if (!user) {
-      res.status(404).send({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
     } else {
-      res.send(user);
+      res.json(user);
     }
   } catch (err) {
     res.status(400).json({ error: err.message });
