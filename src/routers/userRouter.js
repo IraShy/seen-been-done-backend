@@ -1,7 +1,9 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+
 const { User } = require("../models/userModel");
+const { comparePasswords } = require("../utils/authUtils");
 
 // const secretKey = process.env.JWT_KEY
 
@@ -69,9 +71,8 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const hash = await bcrypt.hash(password, 10);
+    const isValid = await comparePasswords(password, user.password);
 
-    const isValid = await bcrypt.compare(user.password, hash);
     if (!isValid) {
       console.log("Invalid password");
       return res.status(400).json({ error: "Invalid email or password" });
