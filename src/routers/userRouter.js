@@ -1,5 +1,9 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const { User } = require("../models/userModel");
+
+// const secretKey = process.env.JWT_KEY
 
 const router = express.Router();
 
@@ -28,14 +32,22 @@ router.get("/:id", async (req, res) => {
 // POST /users/
 router.post("/", async (req, res) => {
   try {
-    let user = await User.create(req.body);
+    const { email, password, admin } = req.body;
+    const hash = await bcrypt.hash(password, 10);
+    console.log(hash);
+    // let user = await User.create(req.body);
+    let user = await User.create({ email, password: hash, admin });
     if (!user) {
       res.status(400).json({ error: "Error registering user" });
     } else {
-      res.json(user);
+      console.log("USER:", user);
+      // res.status(201).json(user);
+      const { password, ...userData } = user._doc;
+      res.status(201).json(userData);
     }
-  } catch {
-    res.status(400).json({ error: "Error registering user" });
+  } catch (err) {
+    // res.status(400).json({ error: "Error registering user" });
+    res.status(400).json({ error: err.message });
   }
 });
 
