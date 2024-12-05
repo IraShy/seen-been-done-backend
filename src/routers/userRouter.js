@@ -5,8 +5,6 @@ const bcrypt = require("bcryptjs");
 const { User } = require("../models/userModel");
 const { comparePasswords } = require("../utils/authUtils");
 
-// const secretKey = process.env.JWT_KEY
-
 const router = express.Router();
 
 // Find all users
@@ -37,18 +35,15 @@ router.post("/", async (req, res) => {
     const { email, password, admin } = req.body;
     const hash = await bcrypt.hash(password, 10);
     console.log(hash);
-    // let user = await User.create(req.body);
     let user = await User.create({ email, password: hash, admin });
     if (!user) {
       res.status(400).json({ error: "Error registering user" });
     } else {
       console.log("USER:", user);
-      // res.status(201).json(user);
       const { password, ...userData } = user._doc;
       res.status(201).json(userData);
     }
   } catch (err) {
-    // res.status(400).json({ error: "Error registering user" });
     res.status(400).json({ error: err.message });
   }
 });
@@ -77,7 +72,6 @@ router.post("/login", async (req, res) => {
       console.log("Invalid password");
       return res.status(400).json({ error: "Invalid email or password" });
     }
-    // res.json(user);
     const payload = {
       id: user._id,
       admin: user.admin,
