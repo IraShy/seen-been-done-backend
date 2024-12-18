@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const { User } = require("../models/userModel");
 const { comparePasswords } = require("../utils/authUtils");
+const { checkCredentialsPresence } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -30,12 +31,14 @@ router.get("/:id", async (req, res) => {
 
 // Register a user
 // POST /users/
-router.post("/", async (req, res) => {
+router.post("/", checkCredentialsPresence, async (req, res) => {
   try {
     const { email, password, admin } = req.body;
     const hash = await bcrypt.hash(password, 10);
     console.log(hash);
+
     let user = await User.create({ email, password: hash, admin });
+
     if (!user) {
       res.status(400).json({ error: "Error registering user" });
     } else {
@@ -51,13 +54,9 @@ router.post("/", async (req, res) => {
 // Login
 // POST /users/login
 
-router.post("/login", async (req, res) => {
+router.post("/login", checkCredentialsPresence, async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!password || !email) {
-      res.status(400).json({ error: "Missing credentials" });
-    }
 
     const user = await User.findOne({ email });
 
