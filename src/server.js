@@ -10,7 +10,9 @@ app.get("/", (request, response, next) => {
 });
 
 const userRouter = require("./routers/userRouter.js");
+const categoryRouter = require("./routers/categoryRouter.js");
 app.use("/users", userRouter);
+app.use("/categories", categoryRouter);
 
 app.get("*", (request, response, next) => {
   response.status(404).json({

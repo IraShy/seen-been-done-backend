@@ -11,7 +11,11 @@ const router = express.Router();
 // Find all users
 // GET /users/
 router.get("/", async (req, res) => {
-  res.json(await User.find({}));
+  try {
+    res.json(await User.find({}));
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
 });
 
 // Find one user by ID
