@@ -8,8 +8,8 @@ const { checkCredentialsPresence } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Find all users
-// GET /users/
+// @desc Find all users
+// @route GET /users/
 router.get("/", async (req, res) => {
   try {
     res.json(await User.find({}));
@@ -18,8 +18,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Find one user by ID
-// GET /users/:id
+// @desc Find one user by ID
+// @route GET /users/:id
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -33,8 +33,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Register a user
-// POST /users/
+// @desc Register a user
+// @route POST /users/
 router.post("/", checkCredentialsPresence, async (req, res) => {
   try {
     const { email, password, admin } = req.body;
@@ -55,8 +55,8 @@ router.post("/", checkCredentialsPresence, async (req, res) => {
   }
 });
 
-// Login
-// POST /users/login
+// @desc Login
+// @route POST /users/login
 
 router.post("/login", checkCredentialsPresence, async (req, res) => {
   try {
@@ -88,8 +88,8 @@ router.post("/login", checkCredentialsPresence, async (req, res) => {
   }
 });
 
-// Update a user
-// PUT /users/:id
+// @desc Update a user
+// @route PUT /users/:id
 router.put("/:id", async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
