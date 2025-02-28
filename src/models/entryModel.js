@@ -12,7 +12,7 @@ const entrySchema = mongoose.Schema({
   //   unique: false,
   // }],
   description: {
-    type: Text,
+    type: String,
     required: false,
   },
   startDate: {
