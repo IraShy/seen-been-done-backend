@@ -1,6 +1,27 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 
 const { Entry } = require("../models/entryModel");
+const { User } = require("../models/userModel");
+
+const authUser = (req, res, next, token) => {
+  jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
+    if (err) {
+      //   err = {
+      //     name: 'NotBeforeError',
+      //     message: 'jwt not active',
+      //     date: 2018-10-04T16:10:44.000Z
+      //   }
+      console.log(err.name);
+
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ error: err.message });
+      }
+    } else {
+      console.log("valid token");
+    }
+  });
+};
 
 const router = express.Router();
 
@@ -18,14 +39,35 @@ router.get("/", async (req, res) => {
 // @route GET /entries/:id
 router.get("/:id", async (req, res) => {
   try {
-    const entry = await Entry.findById(req.params.id);
-    if (!entry) {
-      res.status(404).json({ error: "Entry not found" });
+    if (!req.headers.authorization) {
+      console.log("No Auth");
+      return res.status(401).json({ error: "No token provided" });
+    }
+    const token = req.headers.authorization.split(" ")[1];
+    let decoded;
+
+    try {
+      decoded = jwt.verify(token, process.env.JWT_KEY);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        return res.status(401).json({ error: "Token expired" });
+      }
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    const foundEntry = await Entry.findById(req.params.id);
+    if (!foundEntry) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+    if (foundEntry.author.toString() != decoded.id) {
+      console.log("User is not author of the entry");
+      res.status(403).json({ error: "Access denied" });
     } else {
-      res.json(entry);
+      const { author, ...entryData } = foundEntry._doc;
+      res.json(entryData);
     }
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(500).json({ error: "Server error: " + error.message });
   }
 });
 
@@ -33,7 +75,7 @@ router.get("/:id", async (req, res) => {
 // @route POST /entries
 router.post("/", async (req, res) => {
   try {
-    const { title, description, startDate, endDate } = req.body;
+    const { title, description, startDate, endDate, author } = req.body;
 
     // TODO: check that the end date is not earlier than the start date
     // TODO: if no endDate, should it be the same as startDate or null?

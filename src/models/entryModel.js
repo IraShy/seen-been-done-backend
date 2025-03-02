@@ -23,6 +23,11 @@ const entrySchema = mongoose.Schema({
     type: Date,
     required: false,
   },
+  author: {
+    type: mongoose.Schema.ObjectId,
+    required: true,
+    ref: "User",
+  },
   // TODO:
   // user, tags, chared with, done together with
 });
