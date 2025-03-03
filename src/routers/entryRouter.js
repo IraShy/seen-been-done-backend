@@ -1,27 +1,14 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 
+const {
+  verifyToken,
+  authorizeEntryAccess,
+} = require("../middleware/authMiddleware");
+const { findEntryById } = require("../middleware/entryMiddleware");
+
 const { Entry } = require("../models/entryModel");
 const { User } = require("../models/userModel");
-
-const authUser = (req, res, next, token) => {
-  jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
-    if (err) {
-      //   err = {
-      //     name: 'NotBeforeError',
-      //     message: 'jwt not active',
-      //     date: 2018-10-04T16:10:44.000Z
-      //   }
-      console.log(err.name);
-
-      if (err.name === "TokenExpiredError") {
-        return res.status(401).json({ error: err.message });
-      }
-    } else {
-      console.log("valid token");
-    }
-  });
-};
 
 const router = express.Router();
 
@@ -37,39 +24,16 @@ router.get("/", async (req, res) => {
 
 // @desc Find one entry
 // @route GET /entries/:id
-router.get("/:id", async (req, res) => {
-  try {
-    if (!req.headers.authorization) {
-      console.log("No Auth");
-      return res.status(401).json({ error: "No token provided" });
-    }
-    const token = req.headers.authorization.split(" ")[1];
-    let decoded;
-
-    try {
-      decoded = jwt.verify(token, process.env.JWT_KEY);
-    } catch (error) {
-      if (error.name === "TokenExpiredError") {
-        return res.status(401).json({ error: "Token expired" });
-      }
-      return res.status(401).json({ error: "Invalid token" });
-    }
-
-    const foundEntry = await Entry.findById(req.params.id);
-    if (!foundEntry) {
-      return res.status(404).json({ error: "Entry not found" });
-    }
-    if (foundEntry.author.toString() != decoded.id) {
-      console.log("User is not author of the entry");
-      res.status(403).json({ error: "Access denied" });
-    } else {
-      const { author, ...entryData } = foundEntry._doc;
-      res.json(entryData);
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Server error: " + error.message });
+router.get(
+  "/:id",
+  verifyToken,
+  findEntryById,
+  authorizeEntryAccess,
+  (req, res) => {
+    const { author, ...entryData } = req.foundEntry._doc;
+    return res.json(entryData);
   }
-});
+);
 
 // @desc Create an entry
 // @route POST /entries
