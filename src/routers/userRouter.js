@@ -80,6 +80,7 @@ router.post("/login", checkCredentialsPresence, async (req, res) => {
       admin: user.admin,
     };
     const expiresIn = "2h";
+    // const expiresIn = 5;
     const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn });
     console.log(`${user.email} signed in!\nToken: ${token}`);
     res.json({ token });
