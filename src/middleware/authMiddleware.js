@@ -1,5 +1,10 @@
 const jwt = require("jsonwebtoken");
 
+/**
+ *
+ * @desc Check if email and password are provided in the request body
+ * @throws 400 if credentials are missing
+ */
 const checkCredentialsPresence = (req, res, next) => {
   if (!req.body.password || !req.body.email) {
     return res.status(400).json({ error: "Missing credentials" });
@@ -7,7 +12,10 @@ const checkCredentialsPresence = (req, res, next) => {
   next();
 };
 
-// @desc verify jwt sent for authorization
+/**
+ * @desc Verify JWT from Authorization header
+ * @throws 401 if token is missing, expired, or invalid
+ */
 const verifyToken = (req, res, next) => {
   if (!req.headers.authorization) {
     console.log("No Auth");
@@ -27,7 +35,11 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// @desc verify that user is the author of the entry
+/**
+ *
+ * @@desc Verify that authenticated user is the author of the entry
+ * @throws 403 if the user is not the author
+ */
 const authorizeEntryAccess = (req, res, next) => {
   if (req.foundEntry.author.toString() != req.user.id) {
     console.log("User is not author of the entry");
