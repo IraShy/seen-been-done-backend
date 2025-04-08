@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 
+const { validateId } = require("../middleware/validationMiddleware");
 const {
   verifyToken,
   authorizeEntryAccess,
@@ -25,6 +26,7 @@ router.get("/", verifyToken, async (req, res) => {
 // @route GET /entries/:id
 router.get(
   "/:id",
+  validateId,
   verifyToken,
   findEntryById,
   authorizeEntryAccess,
@@ -63,6 +65,7 @@ router.post("/", verifyToken, async (req, res) => {
 // @route PUT /entries/:id
 router.put(
   "/:id",
+  validateId,
   verifyToken,
   findEntryById,
   authorizeEntryAccess,
@@ -82,6 +85,7 @@ router.put(
 // @route DELETE /entries/:id
 router.delete(
   "/:id",
+  validateId,
   verifyToken,
   findEntryById,
   authorizeEntryAccess,
